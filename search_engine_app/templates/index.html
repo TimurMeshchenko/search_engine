@@ -182,7 +182,7 @@
         }
 
         @media screen and (max-width: 500px) {
-            .search-input {
+            .search-input-div {
                 width: 90% !important;
             }
         }        
@@ -204,7 +204,7 @@
 ">
         <h1 style="font-family: Playwrite GB S, serif; font-weight: 600; font-size: 40px;">Search engine</h1>
 
-        <div class="search-input" style="
+        <div class="search-input-div" style="
                     display: flex;
                     width: 45%;
                     align-items: center;
@@ -212,7 +212,7 @@
                     padding: 10px;
                     border-radius: 20px;
                 ">
-            <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-autocomplete="list"
+            <input class="search-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-autocomplete="list"
                 name="text" autofocus="" placeholder="Найти" style="
                     height: 100%;
                     width: 100%;
@@ -262,5 +262,25 @@
             </div>
         </div>
     </div>
+    <script src="{{ url_for('static', path='js/services.js') }}"></script>
+    <script>
+        // Проверить
+        const search_input = document.querySelector('.search-input');
+        let previous_input_value = null
+
+        search_input.addEventListener('input', async (event) => {
+            const input_value = event.target.value
+            
+            if (!previous_input_value) {
+                previous_input_value = input_value
+            }
+
+            search_suggestions = await get_search_suggestions()
+            previous_input_value = input_value
+            // parse_search_suggestions()
+            // Добавить в html пустой div class=search-suggestions куда добавлю
+            // span с результатами запроса
+        });
+    </script>
 </body>
 </html>
