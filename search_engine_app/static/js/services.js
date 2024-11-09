@@ -1,4 +1,51 @@
-async function send_async_request(url, method, data = null) {
+async function enable_input_suggestions() {
+    const search_input = document.querySelector('.search-input');
+
+    search_input.addEventListener('input', add_search_suggestions)    
+}
+
+async function add_search_suggestions(event) {
+    const input_value = event.target.value
+    
+    if (!previous_input_value) {
+        previous_input_value = input_value
+    }
+
+    const base_url = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}`;
+    const data = {
+        'input_value': input_value,
+        'previous_input_value': previous_input_value,
+    }            
+    previous_input_value = input_value
+    const response_search_suggestions = await send_async_request(
+        `${base_url}/api/get_search_suggestions/`,
+        'POST',
+        data
+    )
+    console.log(response_search_suggestions) // DELETE
+
+    const suggestions_container = document.querySelector('.search-suggestions');
+    suggestions_container.innerHTML = '';
+    
+    if (
+        !response_search_suggestions || 
+        response_search_suggestions.length < 1 ||
+        !Array.isArray(response_search_suggestions[1])
+    ) {
+        return null
+    }
+
+    response_search_suggestions[1].forEach(search_suggestion_array => {
+        const search_suggestion = search_suggestion_array[1];
+        const suggestion_link = document.createElement('a');
+        suggestion_link.classList.add('search-suggestion');
+        suggestion_link.href = `${base_url}/search/${search_suggestion}/`;
+        suggestion_link.textContent = search_suggestion;
+        suggestions_container.appendChild(suggestion_link);
+    });
+}
+
+async function send_async_request(url, method, data=null) {
     try {
         const headers = {
             "Content-Type": "application/json",
@@ -22,13 +69,4 @@ async function send_async_request(url, method, data = null) {
     } catch (error) {
         console.error("Error posting data:", error);
     }
-}
-
-async function get_search_suggestions() {
-    const search_suggestions = await send_async_request(
-        url=`https://yandex.ru/suggest/suggest-ya.cgi?srv=serp_ru_desktop&wiz=TrWth&yu=5128758181730367992&lr=10278&uil=ru&fact=1&v=4&show_experiment=222&show_experiment=224&use_verified=1&safeclick=1&skip_clickdaemon_host=1&rich_nav=1&verified_nav=1&rich_phone=1&use_favicon=1&nav_favicon=1&mt_wizard=1&history=1&nav_text=1&maybe_ads=1&icon=1&hl=1&n=10&portal=1&platform=desktop&mob=0&extend_fw=1&suggest_entity_desktop=1&entity_enrichment=1&entity_max_count=5&svg=1&part=${inputValue}&pos=2&prev-query=${previousInputValue}&hs=0&suggest_reqid=512875818173036799298141657463014`,
-        method='GET',
-    )    
-
-    return search_suggestions
 }

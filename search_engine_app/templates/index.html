@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html style="font-size: 10px;font-family: Arial; height: 100%;" lang="en" darker-dark-theme darker-dark-theme-deprecate dark
     system-icons typography typography-spacing>
@@ -5,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Timur Meshchenko</title>
-    <link rel="icon" href="media/favicon.ico">
+    <link rel="icon" href="/search_engine/media/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+GB+S:ital,wght@0,100..400;1,100..400&display=swap"
@@ -185,6 +187,9 @@
             .search-input-div {
                 width: 90% !important;
             }
+            .search-suggestions {
+                width: calc(90% + 22px) !important;
+            }
         }        
         @media screen and (max-width: 250px) {
             .search-additional {
@@ -261,26 +266,12 @@
                 </svg>
             </div>
         </div>
+        <div class="search-suggestions" style="background: black;width: calc(45% + 22px);height: 30px;border-radius: 5px;display: flex;flex-direction: column;"></div>
     </div>
-    <script src="{{ url_for('static', path='js/services.js') }}"></script>
+    <script src="{% static 'js/services.js' %}"></script>
     <script>
-        // Проверить
-        const search_input = document.querySelector('.search-input');
         let previous_input_value = null
-
-        search_input.addEventListener('input', async (event) => {
-            const input_value = event.target.value
-            
-            if (!previous_input_value) {
-                previous_input_value = input_value
-            }
-
-            search_suggestions = await get_search_suggestions()
-            previous_input_value = input_value
-            // parse_search_suggestions()
-            // Добавить в html пустой div class=search-suggestions куда добавлю
-            // span с результатами запроса
-        });
+        enable_input_suggestions()
     </script>
 </body>
 </html>
