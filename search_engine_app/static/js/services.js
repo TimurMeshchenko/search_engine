@@ -1,17 +1,31 @@
 async function enable_input_suggestions() {
     const search_input = document.querySelector('.search-input');
+    const search_input_div = document.querySelector('.search-input-div');
+    const search_suggestions = document.querySelector('.search-suggestions');
 
-    search_input.addEventListener('input', add_search_suggestions)    
+    search_input.addEventListener('input', add_search_suggestions) 
+    
+    search_input.addEventListener('focus', () => {
+        if (search_suggestions.childElementCount > 0) {
+            search_input_div.classList.add('search-input-focused');
+            search_suggestions.style.display = 'flex';
+        }
+    });
+    
+    search_input.addEventListener('blur', () => {
+        search_input_div.classList.remove('search-input-focused');
+        search_suggestions.style.display = 'none';
+    });    
 }
 
 async function add_search_suggestions(event) {
-    const input_value = event.target.value
+    const input_value = event.target.value;
+    const base_url = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}`;
     
     if (!previous_input_value) {
         previous_input_value = input_value
     }
 
-    const base_url = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}`;
     const data = {
         'input_value': input_value,
         'previous_input_value': previous_input_value,
@@ -22,10 +36,8 @@ async function add_search_suggestions(event) {
         'POST',
         data
     )
-    console.log(response_search_suggestions) // DELETE
-
-    const suggestions_container = document.querySelector('.search-suggestions');
-    suggestions_container.innerHTML = '';
+    const search_suggestions = document.querySelector('.search-suggestions');
+    search_suggestions.innerHTML = '';
     
     if (
         !response_search_suggestions || 
@@ -37,12 +49,18 @@ async function add_search_suggestions(event) {
 
     response_search_suggestions[1].forEach(search_suggestion_array => {
         const search_suggestion = search_suggestion_array[1];
+        const search_suggestion_joined = search_suggestion.split(' ').join('+');
         const suggestion_link = document.createElement('a');
+    
         suggestion_link.classList.add('search-suggestion');
-        suggestion_link.href = `${base_url}/search/${search_suggestion}/`;
+        suggestion_link.href = `${base_url}/search/?text=${search_suggestion_joined}/`;
         suggestion_link.textContent = search_suggestion;
-        suggestions_container.appendChild(suggestion_link);
+        search_suggestions.appendChild(suggestion_link);
     });
+
+    const search_input_div = document.querySelector('.search-input-div');
+    search_suggestions.style.display = 'flex';
+    search_input_div.classList.add('search-input-focused');
 }
 
 async function send_async_request(url, method, data=null) {

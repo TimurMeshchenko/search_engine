@@ -188,20 +188,29 @@
                 width: 90% !important;
             }
             .search-suggestions {
-                width: calc(90% + 22px) !important;
+                width: calc(90% + 20px) !important;
             }
         }        
         @media screen and (max-width: 250px) {
             .search-additional {
                 display: none !important;
             }
-        }        
+        }      
+        .search-suggestion {
+            color: black;
+            font-size: 18px;            
+            text-decoration: none;
+            padding: 5px 12px;
+        }  
+        .search-input-focused {
+            border-radius: 20px 20px 0px 0px !important;
+            border-bottom: none !important;
+        }
     </style>
 </head>
 
-<body style="height: 100%;">
+<body>
     <div class="search" style="
-    height: 75%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -266,7 +275,7 @@
                 </svg>
             </div>
         </div>
-        <div class="search-suggestions" style="background: black;width: calc(45% + 22px);height: 30px;border-radius: 5px;display: flex;flex-direction: column;"></div>
+        <div class="search-suggestions" style="width: calc(45% + 20px);border: 1px solid black;border-radius: 0px 0px 5px 5px;display: none;flex-direction: column;"></div>
     </div>
     <script src="{% static 'js/services.js' %}"></script>
     <script>
