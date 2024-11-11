@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html style="font-size: 10px;font-family: Arial; height: 100%;" lang="en" darker-dark-theme darker-dark-theme-deprecate dark
     system-icons typography typography-spacing>
@@ -182,9 +184,12 @@
         }
 
         @media screen and (max-width: 500px) {
-            .search-input {
+            .search-input-div {
                 width: 90% !important;
             }
+            .search-suggestions {
+                width: calc(90% + 20px) !important;
+            }            
             .search-item {
                 width: calc(90% + 32px) !important;
             }
@@ -194,6 +199,16 @@
                 display: none !important;
             }
         } 
+        .search-suggestion {
+            color: black;
+            font-size: 18px;            
+            text-decoration: none;
+            padding: 5px 12px;
+        }    
+        .search-input-focused {
+            border-radius: 20px 20px 0px 0px !important;
+            border-bottom: none !important;
+        }            
         .search-item {
             display: flex;
             width: calc(45% + 32px); 
@@ -223,11 +238,11 @@
     </style>
 </head>
 
-<body style="height: 100%;">
+<body>
     <div class="search" style="
             padding: 15px 40px;
         ">
-        <div class="search-input" style="
+        <div class="search-input-div" style="
                             display: flex;
                             width: 45%;
                             align-items: center;
@@ -235,7 +250,7 @@
                             padding: 8px 15px;
                             border-radius: 20px;
                         ">
-            <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-autocomplete="list"
+            <input class="search-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-autocomplete="list"
                 name="text" autofocus="" placeholder="Найти" style="
                             height: 100%;
                             width: 100%;
@@ -284,6 +299,9 @@
                 </svg>
             </div>
         </div>
+        <div class="search-suggestions"
+            style="width: calc(45% - 6px);border: 1px solid black;border-radius: 0px 0px 5px 5px;display: none;flex-direction: column;position: absolute;">
+        </div>
         <div class="search-body" style="
                 margin-top: 25px;
             ">
@@ -316,5 +334,10 @@
             </div>
         </div>
     </div>
+    <script src="{% static 'js/services.js' %}"></script>
+    <script>
+        let previous_input_value = null
+        enable_input_suggestions()
+    </script>    
 </body>
 </html>
