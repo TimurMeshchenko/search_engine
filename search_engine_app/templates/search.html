@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Timur Meshchenko</title>
-    <link rel="icon" href="media/favicon.ico">
+    <link rel="icon" href="/search_engine/media/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+GB+S:ital,wght@0,100..400;1,100..400&display=swap"
@@ -235,21 +235,37 @@
         .search-description {
             font-size: 13px;
         } 
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }        
     </style>
 </head>
 
 <body>
+    <div class="popup-overlay"></div>
     <div class="search" style="
             padding: 15px 40px;
         ">
         <div class="search-input-div" style="
-                            display: flex;
-                            width: 45%;
-                            align-items: center;
-                            border: 1px solid black;
-                            padding: 8px 15px;
-                            border-radius: 20px;
-                        ">
+            display: flex;
+            width: 45%;
+            align-items: center;
+            border: 1px solid black;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: white;
+            z-index: 1;
+            position: relative;                            
+        ">
             <input class="search-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-autocomplete="list"
                 name="text" autofocus="" placeholder="Найти" style="
                             height: 100%;
@@ -300,7 +316,7 @@
             </div>
         </div>
         <div class="search-suggestions"
-            style="width: calc(45% - 6px);border: 1px solid black;border-radius: 0px 0px 5px 5px;display: none;flex-direction: column;position: absolute;">
+            style="width: calc(45% - 6px);border: 1px solid black;border-radius: 0px 0px 5px 5px;display: none;flex-direction: column;position: absolute;z-index: 1;background-color: white;">
         </div>
         <div class="search-body" style="
                 margin-top: 25px;

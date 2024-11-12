@@ -2,6 +2,7 @@ async function enable_input_suggestions() {
     const search_input = document.querySelector('.search-input');
     const search_input_div = document.querySelector('.search-input-div');
     const search_suggestions = document.querySelector('.search-suggestions');
+    const popup_overlay = document.querySelector('.popup-overlay');
 
     search_input.addEventListener('input', add_search_suggestions) 
     
@@ -9,12 +10,14 @@ async function enable_input_suggestions() {
         if (search_suggestions.childElementCount > 0) {
             search_input_div.classList.add('search-input-focused');
             search_suggestions.style.display = 'flex';
+            popup_overlay.style.display = 'flex';
         }
     });
     
     search_input.addEventListener('blur', () => {
         search_input_div.classList.remove('search-input-focused');
         search_suggestions.style.display = 'none';
+        popup_overlay.style.display = 'none';
     });    
 }
 
@@ -59,7 +62,10 @@ async function add_search_suggestions(event) {
     });
 
     const search_input_div = document.querySelector('.search-input-div');
+    const popup_overlay = document.querySelector('.popup-overlay');
+
     search_suggestions.style.display = 'flex';
+    popup_overlay.style.display = 'flex';
     search_input_div.classList.add('search-input-focused');
 }
 
