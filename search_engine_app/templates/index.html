@@ -280,6 +280,8 @@
     <script src="{% static 'js/services.js' %}"></script>
     <script>
         let previous_input_value = null
+        const base_url = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}`;
+        
         enable_input_suggestions()
     </script>
 </body>

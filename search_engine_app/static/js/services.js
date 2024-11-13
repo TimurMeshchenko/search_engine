@@ -10,20 +10,34 @@ async function enable_input_suggestions() {
         if (search_suggestions.childElementCount > 0) {
             search_input_div.classList.add('search-input-focused');
             search_suggestions.style.display = 'flex';
-            popup_overlay.style.display = 'flex';
+            
+            if (popup_overlay) {
+                popup_overlay.style.display = 'flex';
+            }
         }
     });
     
     search_input.addEventListener('blur', () => {
         search_input_div.classList.remove('search-input-focused');
         search_suggestions.style.display = 'none';
-        popup_overlay.style.display = 'none';
+        
+        if (popup_overlay) {
+            popup_overlay.style.display = 'none';
+        }        
+    });    
+
+    search_input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            const input_value = event.target.value;  
+            const input_value_joined = input_value.split(' ').join('+');
+
+            window.location.href = `${base_url}/search/?text=${input_value_joined}`;;
+        }
     });    
 }
 
 async function add_search_suggestions(event) {
     const input_value = event.target.value;
-    const base_url = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}`;
     
     if (!previous_input_value) {
         previous_input_value = input_value
@@ -56,7 +70,7 @@ async function add_search_suggestions(event) {
         const suggestion_link = document.createElement('a');
     
         suggestion_link.classList.add('search-suggestion');
-        suggestion_link.href = `${base_url}/search/?text=${search_suggestion_joined}/`;
+        suggestion_link.href = `${base_url}/search/?text=${search_suggestion_joined}`;
         suggestion_link.textContent = search_suggestion;
         search_suggestions.appendChild(suggestion_link);
     });
@@ -64,8 +78,11 @@ async function add_search_suggestions(event) {
     const search_input_div = document.querySelector('.search-input-div');
     const popup_overlay = document.querySelector('.popup-overlay');
 
+    if (popup_overlay) {
+        popup_overlay.style.display = 'flex';
+    }
+    
     search_suggestions.style.display = 'flex';
-    popup_overlay.style.display = 'flex';
     search_input_div.classList.add('search-input-focused');
 }
 
