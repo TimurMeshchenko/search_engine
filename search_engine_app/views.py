@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,31 +18,42 @@ class SearchView(APIView):
     template_name = "search.html"
 
     def get(self, request, *args, **kwargs):
-        search_request_text = request.GET.get('text', '')
+        search_request_text = request.GET.get('text', '')[:-1]
         
         if not search_request_text:
             return None
     
-        url = f'https://www.yandex.ru/search/?text={search_request_text}'
-        headers = {
-            # Возможно потухнет, проверить
-            "Cookie": "_yasc=Dw/vMqjUtGfvC02lZsjEjY7QoIiWHi635gXHmK1P6BjjwfZkfNeFB3L5znH/i4EdzN/aUg==; bh=YMDa0bkGagL6Ow==; i=S1mhN64F4HiWu9HoFz7OpHcib7BZHrj26caVK4EgGs//FDZAzWyPWh4Rscf7GVvA4B/b9Z2V6RC96TrMzqdZhm9M71k=; is_gdpr=0; is_gdpr_b=CI6mChCcngIoAg==; receive-cookie-deprecation=1; spravka=dD0xNjk5OTUzMDc5O2k9MzEuMTQ2LjIwMi4xODg7RD1CMjY1Q0M5ODAzODlDREJFOTJDQzM0QTY4MjdFNUI1RTcyRjIxRURENTVFQzQwNUE0OTc1Qzk3QzMyQTUwMkRGNzRDQTgyODA1NUQ5RDlFNzt1PTE2OTk5NTMwNzk1NDg4MjcyMzY7aD05MGYwOGE3YTkyZjhiYzFkMjc0NWY5OTgzYmEwYWRjOA==; yandexuid=6539346971731489079; yashr=3774455851731489079; ys=wprid.1731489136722416-793728500892691594-balancer-l7leveler-kubr-yp-vla-207-BAL",
-            "Postman-Token": str(uuid.uuid4()),
-            "User-Agent": "PostmanRuntime/7.42.0",        
-        }
+        # url = f'https://www.yandex.ru/search/?text={search_request_text}'
+        # headers = {
+        #     "Cookie": "_yasc=Dw/vMqjUtGfvC02lZsjEjY7QoIiWHi635gXHmK1P6BjjwfZkfNeFB3L5znH/i4EdzN/aUg==; bh=YMDa0bkGagL6Ow==; i=S1mhN64F4HiWu9HoFz7OpHcib7BZHrj26caVK4EgGs//FDZAzWyPWh4Rscf7GVvA4B/b9Z2V6RC96TrMzqdZhm9M71k=; is_gdpr=0; is_gdpr_b=CI6mChCcngIoAg==; receive-cookie-deprecation=1; spravka=dD0xNjk5OTUzMDc5O2k9MzEuMTQ2LjIwMi4xODg7RD1CMjY1Q0M5ODAzODlDREJFOTJDQzM0QTY4MjdFNUI1RTcyRjIxRURENTVFQzQwNUE0OTc1Qzk3QzMyQTUwMkRGNzRDQTgyODA1NUQ5RDlFNzt1PTE2OTk5NTMwNzk1NDg4MjcyMzY7aD05MGYwOGE3YTkyZjhiYzFkMjc0NWY5OTgzYmEwYWRjOA==; yandexuid=6539346971731489079; yashr=3774455851731489079; ys=wprid.1731489136722416-793728500892691594-balancer-l7leveler-kubr-yp-vla-207-BAL",
+        #     "Postman-Token": str(uuid.uuid4()),
+        #     "User-Agent": "PostmanRuntime/7.42.0",        
+        # }
+        # search_response = requests.get(url, headers=headers)
 
-        search_response = requests.get(url, headers=headers)
-        print(search_response)
-        with open('test.html', 'w') as f:
-            f.write(search_response.text)
+        # with open('test.html', 'w') as f:
+        #     f.write(search_response.text)
+        with open('test.html', 'r') as f:
+            html_content = f.read()
 
-        # parse_search_response()
-        # search_results = <ul id="search-result">
-        # search_result = search-result <li><div>[0] итерированный
-        # Если search_result пуст скип
-        # search_result_title = search_result <div>[0]<a>
-        # search_result_link = search_result <div>[1]
-        # search_result_description = search_result <div>[2]
+        soup = BeautifulSoup(html_content, "html.parser")
+        search_results = soup.find("ul", id="search-result").find_all("li")
+
+        for search_result in search_results[1:2]:
+            search_result_parts = search_result.find('div').find_all('div', recursive=False)
+            search_result_title = search_result_parts[0].find('a')
+            search_result_link = search_result_parts[1]
+            search_result_description = search_result_parts[2]
+
+            print(f'search_result_title {search_result_title}')
+            print(f'search_result_link {search_result_link}')
+            print(f'search_result_description {search_result_description}')
+
+
+        # if search_results:
+        #     items = search_results.find_all("li")
+        #     for item in items:
+        #         print(item)
 
         # Парсить и через jinja обработать
         return render(request, self.template_name)
