@@ -6,6 +6,7 @@ import httpx
 from rest_framework.decorators import api_view
 import uuid
 import requests
+from urllib.parse import urlparse
 
 class IndexView(APIView):
     template_name = "index.html"
@@ -18,46 +19,90 @@ class SearchView(APIView):
     template_name = "search.html"
 
     def get(self, request, *args, **kwargs):
-        search_request_text = request.GET.get('text', '')[:-1]
-        
+        search_request_text = request.GET.get('text', '')
+        headers = {
+            "Cookie": "_yasc=Dw/vMqjUtGfvC02lZsjEjY7QoIiWHi635gXHmK1P6BjjwfZkfNeFB3L5znH/i4EdzN/aUg==; bh=YMDa0bkGagL6Ow==; i=S1mhN64F4HiWu9HoFz7OpHcib7BZHrj26caVK4EgGs//FDZAzWyPWh4Rscf7GVvA4B/b9Z2V6RC96TrMzqdZhm9M71k=; is_gdpr=0; is_gdpr_b=CI6mChCcngIoAg==; receive-cookie-deprecation=1; spravka=dD0xNjk5OTUzMDc5O2k9MzEuMTQ2LjIwMi4xODg7RD1CMjY1Q0M5ODAzODlDREJFOTJDQzM0QTY4MjdFNUI1RTcyRjIxRURENTVFQzQwNUE0OTc1Qzk3QzMyQTUwMkRGNzRDQTgyODA1NUQ5RDlFNzt1PTE2OTk5NTMwNzk1NDg4MjcyMzY7aD05MGYwOGE3YTkyZjhiYzFkMjc0NWY5OTgzYmEwYWRjOA==; yandexuid=6539346971731489079; yashr=3774455851731489079; ys=wprid.1731489136722416-793728500892691594-balancer-l7leveler-kubr-yp-vla-207-BAL",
+            "Postman-Token": str(uuid.uuid4()),
+            "User-Agent": "PostmanRuntime/7.42.0",        
+        }
+        soup = None
+        search_results_ul = None
+
         if not search_request_text:
-            return None
+            return render(request, self.template_name)
     
-        # url = f'https://www.yandex.ru/search/?text={search_request_text}'
-        # headers = {
-        #     "Cookie": "_yasc=Dw/vMqjUtGfvC02lZsjEjY7QoIiWHi635gXHmK1P6BjjwfZkfNeFB3L5znH/i4EdzN/aUg==; bh=YMDa0bkGagL6Ow==; i=S1mhN64F4HiWu9HoFz7OpHcib7BZHrj26caVK4EgGs//FDZAzWyPWh4Rscf7GVvA4B/b9Z2V6RC96TrMzqdZhm9M71k=; is_gdpr=0; is_gdpr_b=CI6mChCcngIoAg==; receive-cookie-deprecation=1; spravka=dD0xNjk5OTUzMDc5O2k9MzEuMTQ2LjIwMi4xODg7RD1CMjY1Q0M5ODAzODlDREJFOTJDQzM0QTY4MjdFNUI1RTcyRjIxRURENTVFQzQwNUE0OTc1Qzk3QzMyQTUwMkRGNzRDQTgyODA1NUQ5RDlFNzt1PTE2OTk5NTMwNzk1NDg4MjcyMzY7aD05MGYwOGE3YTkyZjhiYzFkMjc0NWY5OTgzYmEwYWRjOA==; yandexuid=6539346971731489079; yashr=3774455851731489079; ys=wprid.1731489136722416-793728500892691594-balancer-l7leveler-kubr-yp-vla-207-BAL",
-        #     "Postman-Token": str(uuid.uuid4()),
-        #     "User-Agent": "PostmanRuntime/7.42.0",        
-        # }
-        # search_response = requests.get(url, headers=headers)
+        while search_request_text:
+            try:
+                url = f'https://www.yandex.ru/search/?text={search_request_text}'
+                search_response = requests.get(url, headers=headers)
+                html_content = search_response.text
+                
+                search_response.raise_for_status()
 
-        # with open('test.html', 'w') as f:
-        #     f.write(search_response.text)
-        with open('test.html', 'r') as f:
-            html_content = f.read()
+                soup = BeautifulSoup(html_content, "html.parser")
+                search_results_ul = soup.find("ul", id="search-result")
 
-        soup = BeautifulSoup(html_content, "html.parser")
-        search_results = soup.find("ul", id="search-result").find_all("li")
+                if not search_results_ul:
+                    raise Exception('Captcha')
 
-        for search_result in search_results[1:2]:
-            search_result_parts = search_result.find('div').find_all('div', recursive=False)
-            search_result_title = search_result_parts[0].find('a')
-            search_result_link = search_result_parts[1]
-            search_result_description = search_result_parts[2]
+                break
+            except Exception:
+                search_request_text = search_request_text[:-1]
 
-            print(f'search_result_title {search_result_title}')
-            print(f'search_result_link {search_result_link}')
-            print(f'search_result_description {search_result_description}')
+        search_results = search_results_ul.find_all("li")
+        styles = soup.find_all('style')
+        favicon_domain = '//favicon.yandex.net'
+        search_items = []
+        context = {
+            'search_items': search_items
+        }
 
+        for search_result in search_results:
+            search_result_div = search_result.find('div')
+            
+            if not search_result_div:
+                continue
 
-        # if search_results:
-        #     items = search_results.find_all("li")
-        #     for item in items:
-        #         print(item)
+            search_result_parts = search_result_div.find_all('div', recursive=False)
+            search_result_title_index = 0
+            search_result_title = None
+            
+            if not search_result_parts:
+                continue
 
-        # Парсить и через jinja обработать
-        return render(request, self.template_name)
+            while not search_result_title and search_result_title_index < len(search_result_parts):
+                search_result_title = search_result_parts[search_result_title_index].find('a')
+                search_result_title_index += 1
 
+            if not search_result_title:
+                continue
+
+            link = search_result_title.get('href')
+            search_result_icon = search_result_title.find('div')
+            icon_styles = search_result_icon.get('style')
+            parsed_link = urlparse(link)
+            base_link = f"{parsed_link.scheme}://{parsed_link.netloc}" 
+
+            if icon_styles and 'background-image' not in icon_styles:
+                for style in styles:
+                    style = style.string
+                    if style and base_link in style:
+                        icon_link = style.split(favicon_domain)[-1].split(');')[0]
+                        icon = f'https://favicon.yandex.net{icon_link}'
+                        icon_styles += f';background-image:url("{icon}"'
+                        break
+
+            title = search_result_title.find('span').text       
+            description = search_result_parts[-1].find('span').text
+            search_item = {
+                'icon_styles': icon_styles,
+                'title': title,
+                'link': link[:60],
+                'description': description,
+            }
+            search_items.append(search_item)
+
+        return render(request, self.template_name, context)
 
 @api_view(['POST'])
 def get_search_suggestions(request):
