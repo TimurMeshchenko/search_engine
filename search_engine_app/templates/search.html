@@ -273,7 +273,7 @@
             position: relative;                            
         ">
             <input class="search-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-autocomplete="list"
-                name="text" autofocus="" placeholder="Найти" style="
+                name="text" placeholder="Найти" style="
                             height: 100%;
                             width: 100%;
                             border: none;
@@ -357,7 +357,7 @@
         const url = window.location.href;
         const params = new URLSearchParams(window.location.search);
         const text_param = params.get('text');                
-        const base_url = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}`;
+        const base_url = `${window.location.protocol}//${window.location.hostname}/search_engine`;
         let previous_input_value = null
 
         _search_input.value = text_param

@@ -17,7 +17,11 @@ async function enable_input_suggestions() {
         }
     });
     
-    search_input.addEventListener('blur', () => {
+    search_input.addEventListener('blur', (event) => {
+        if (event.target == search_input) {
+            return null
+        };
+
         search_input_div.classList.remove('search-input-focused');
         search_suggestions.style.display = 'none';
         
