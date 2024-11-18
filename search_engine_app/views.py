@@ -79,6 +79,10 @@ class SearchView(APIView):
 
             link = search_result_title.get('href')
             search_result_icon = search_result_title.find('div')
+            
+            if not search_result_icon:
+                continue
+            
             icon_styles = search_result_icon.get('style')
             parsed_link = urlparse(link)
             base_link = f"{parsed_link.scheme}://{parsed_link.netloc}" 

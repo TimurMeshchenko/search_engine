@@ -329,7 +329,7 @@
             ">
             {% for search_item in search_items %}
             <div class="search-item">
-                <div class="search-icon" style="{{ search_item.icon_styles }}"></div>
+                <div class="search-icon" {% if search_item.icon_styles %}style="{{ search_item.icon_styles }}"{% endif %}></div>
                 <div class="search-content">
                     <div class="search-title">
                         <a href="{{ search_item.link }}" class="search-item-link">
