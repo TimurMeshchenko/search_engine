@@ -3,8 +3,11 @@
 poetry run python manage.py runserver
 
 poetry install
-poetry run python -m uvicorn store.asgi:application --reload --port 8001
+poetry run python -m uvicorn search_engine.asgi:application --reload --port 8005
 poetry run ./run_with_reload.sh
+
+Прод:
+poetry run python -m uvicorn search_engine.asgi:application --port 8005
 
 # Webpack optimization
 
